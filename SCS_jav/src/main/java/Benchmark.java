@@ -1,5 +1,11 @@
+import com.sun.jna.Native;
+import com.sun.jna.platform.win32.BaseTSD;
+import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.win32.StdCallLibrary;
+
 import java.io.*;
 import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.*;
 
@@ -12,9 +18,9 @@ public class Benchmark {
     private static final Condition condition = lock.newCondition();
     private static int turn = 0;
 
-    public static void main(String[] args) {
-       // double val = measureThreadMigration(1000);
-       // System.out.println(val);
+    public static void main(String[] args) throws Exception {
+         double val = measureThreadMigration(1000);
+          System.out.println(val);
         //benchmark();
     }
 
@@ -131,48 +137,41 @@ public class Benchmark {
         return (double) finalTime / 1_000_000_000;
     }
 
-//    public static double measureThreadMigration(int iterations) {
-//        long totalTime = 0;
-//        for (int i = 0; i < iterations; i++) {
-//            long start = System.nanoTime();
-//
-//            // Create a CountDownLatch to wait for the thread to complete.
-//            CountDownLatch latch = new CountDownLatch(1);
-//
-//            Thread thread = new Thread(() -> {
-//                try {
-//                    // Simulate some work
-//                    Thread.sleep(10);
-//
-//                    // Set thread affinity to core 0
-//                    ManagementFactory.getThreadMXBean().setThreadAffinityMask(Thread.currentThread().getId(), 1);
-//
-//                    // Set thread affinity to core 1
-//                    ManagementFactory.getThreadMXBean().setThreadAffinityMask(Thread.currentThread().getId(), 2);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    // Count down the latch to allow the main thread to continue
-//                    latch.countDown();
-//                }
-//            });
-//
-//            thread.start();
-//
-//            try {
-//                // Wait for the thread to complete
-//                latch.await();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            long end = System.nanoTime();
-//            totalTime += (end - start);
-//        }
-//
-//        return (double) totalTime / 1_000_000_000;
-//    }
-//
+
+
+    // Native interface for Kernel32.dll
+    public interface Kernel32 extends StdCallLibrary {
+        Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class);
+
+        WinNT.HANDLE GetCurrentThread();
+
+        long SetThreadAffinityMask(WinNT.HANDLE hThread, BaseTSD.SIZE_T dwThreadAffinityMask);
+    }
+
+    public static double measureThreadMigration(int iterations) {
+        WinNT.HANDLE thread = Kernel32.INSTANCE.GetCurrentThread();
+        long affinityMask1 = 0x1;
+        long affinityMask2 = 0x2;
+
+
+        double startTime = System.nanoTime();
+        for (int i = 0; i < iterations; i++) {
+            long result = Kernel32.INSTANCE.SetThreadAffinityMask(thread, new BaseTSD.SIZE_T(affinityMask1));
+            if (result == 0) {
+                throw new RuntimeException("Failed to set affinity mask to CPU 1");
+            }
+
+            result = Kernel32.INSTANCE.SetThreadAffinityMask(thread, new BaseTSD.SIZE_T(affinityMask2));
+            if (result == 0) {
+                throw new RuntimeException("Failed to set affinity mask to CPU 2");
+            }
+        }
+        double endTime = System.nanoTime();
+
+        return (endTime - startTime) / 1_000_000_000.0;
+    }
+
+
 
     public static void writeToFile(String filename, double time, int i) {
         try (FileWriter fileWriter = new FileWriter(filename, !firstOpen)) {
