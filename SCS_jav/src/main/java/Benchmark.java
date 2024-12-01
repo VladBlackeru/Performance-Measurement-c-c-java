@@ -19,9 +19,7 @@ public class Benchmark {
     private static int turn = 0;
 
     public static void main(String[] args) throws Exception {
-         double val = measureThreadMigration(1000);
-          System.out.println(val);
-        //benchmark();
+        benchmark();
     }
 
     public static double staticMemoryAllocation(int iterations) {
@@ -63,10 +61,9 @@ public class Benchmark {
         int[] dynamicArray = new int[numberOfElements];
 
         long startDynamic = System.nanoTime();
-        for (int i = 0; i < iterations; i++) {
-            for (int j = 0; j < numberOfElements; j++)
-                dynamicArray[j] = j;
-        }
+        for (int j = 0; j < numberOfElements; j++)
+            dynamicArray[j] = j;
+
         long endDynamic = System.nanoTime();
 
         return (double) (endDynamic - startDynamic) / 1_000_000_000;
@@ -187,10 +184,9 @@ public class Benchmark {
         int k = 0;
         for (int i = 10000; i <= 1000010000; i += 10000000) {
             System.out.println(k++);
-            avgTime = dynamicMemoryAllocation(tests, i);
+            avgTime = dynamicMemoryAllocation(1, i);
             writeToFile("mem_allocation_java.txt", avgTime, i);
-
-            avgTime = dynamicMemoryAccess(tests, i);
+            avgTime = dynamicMemoryAccess(1, i);
             writeToFile("dynamic_memory_access_java.txt", avgTime, i);
 
             avgTime = threadCreation(i/100000);
