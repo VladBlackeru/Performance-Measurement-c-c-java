@@ -49,10 +49,9 @@ double dynamic_memory_access(int iterations, int NrOfElements) {
     int* dynamic_array = (int*) malloc(NrOfElements * sizeof(int));
 
     clock_t start_dynamic = clock();
-    for (int i = 0; i < iterations; i++) {
-        for (int j = 0; j < NrOfElements; j++)
-            dynamic_array[j] = j;
-    }
+    for (int j = 0; j < NrOfElements; j++)
+        dynamic_array[j] = j;
+
     clock_t end_dynamic = clock();
 
     free(dynamic_array);
@@ -99,6 +98,7 @@ void* thread_function2(void* arg) {
 double measure_context_switch_time(int iterations) {
     clock_t final = 0;
     for (int i = 0; i < iterations; i++) {
+        clock_t start = clock();
         pthread_t thread1, thread2;
         int id1 = 0, id2 = 1;
 
@@ -107,7 +107,6 @@ double measure_context_switch_time(int iterations) {
 
         pthread_create(&thread1, nullptr, thread_function2, &id1);
         pthread_create(&thread2, nullptr, thread_function2, &id2);
-        clock_t start = clock();
         void* time1;
         void* time2;
         pthread_join(thread1, &time1);
@@ -161,21 +160,25 @@ void write_to_file(const std::string& filename, double time, int i) {
 
 void benchmark() {
     double avg_time;
-    for (int i = 10000; i <= 100000; i += 10000) {
+    int k = 0;
+    for (int i = 10000; i <= 1000010000; i += 10000000) {
+        std::cout<<k++<<'\n';
+
         avg_time = dynamic_mem_allocation(tests, i);
         write_to_file("mem_allocation_cpp.txt", avg_time, i);
 
         avg_time = dynamic_memory_access(tests, i);
         write_to_file("dynamic_memory_access_cpp.txt", avg_time, i);
 
-        avg_time = thread_creation(i);
-        write_to_file("thread_creation_cpp.txt", avg_time, i);
+        avg_time = thread_creation(i/100000);
+        write_to_file("thread_creation_cpp.txt", avg_time, i/100000);
 
-        avg_time = measure_context_switch_time(i);
-        write_to_file("measure_context_switch_time_cpp.txt", avg_time, i);
+        avg_time = measure_context_switch_time(i/100000);
+        write_to_file("measure_context_switch_time_cpp.txt", avg_time, i/100000);
 
-        avg_time = measure_thread_migration(i);
-        write_to_file("measure_thread_migration_cpp.txt", avg_time, i);
+        avg_time = measure_thread_migration(i/100000);
+        write_to_file("measure_thread_migration_cpp.txt", avg_time, i/100000);
+        first_open = false;
     }
 }
 

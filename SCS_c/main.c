@@ -51,10 +51,8 @@ double dynamic_memory_access(int iterations,int NrOfElements) {
     int* dynamic_array = (int*) malloc(NrOfElements * sizeof(int));
 
     clock_t start_dynamic = clock();
-    for(int i = 0; i < iterations; i++){
-        for(int j = 0; j < NrOfElements; j++)
-            dynamic_array[j] = j;
-    }
+    for(int j = 0; j < NrOfElements; j++)
+        dynamic_array[j] = j;
     clock_t end_dynamic = clock();
 
     free(dynamic_array);
@@ -74,7 +72,7 @@ double thread_creation(int iterations){
         pthread_create(&thread, NULL, thread_function, NULL);
         pthread_join(thread, NULL);
         clock_t end = clock();
-        final = end - start;
+        final += end - start;
     }
     return (double)(final)/CLOCKS_PER_SEC;
 }
@@ -103,6 +101,7 @@ void* thread_function2(void* arg) {
 double measure_context_switch_time(int iterations) {
     clock_t final = 0;
     for (int i = 0; i < iterations; i++) {
+        clock_t start = clock();
         pthread_t thread1, thread2;
         int id1 = 0, id2 = 1;
 
@@ -111,14 +110,13 @@ double measure_context_switch_time(int iterations) {
 
         pthread_create(&thread1, NULL, thread_function2, &id1);
         pthread_create(&thread2, NULL, thread_function2, &id2);
-        clock_t start = clock();
         void* time1;
         void* time2;
         pthread_join(thread1, &time1);
         pthread_join(thread2, &time2);
 
         clock_t end = clock();
-        clock_t final = (end - start);
+        final += (end - start);
         pthread_mutex_destroy(&mutex);
         pthread_cond_destroy(&cond);
     }
@@ -165,22 +163,23 @@ void write_to_file(const char* filename, double time, int i) {
 
 void benchmark(){
     double avg_time;
+    int k = 0;
     for(int i = 10000; i <= 1000010000; i+= 10000000){
-        avg_time = dynamic_mem_allocation(tests,i);
-        write_to_file("mem_allocation_c.txt", avg_time,i);
+        printf("%d \n", k++);
+//        avg_time = dynamic_mem_allocation(tests,i);
+//        write_to_file("mem_allocation_c.txt", avg_time,i);
 
-        avg_time = dynamic_memory_access(tests, i);
-        write_to_file("dynamic_memory_access_c.txt", avg_time,i);
+//        avg_time = dynamic_memory_access(tests, i);
+//        write_to_file("dynamic_memory_access_c.txt", avg_time,i);
 
-        avg_time = thread_creation(i);
-        write_to_file("thread_creation_c.txt", avg_time, i);
+        avg_time = thread_creation(i/100000);
+        write_to_file("thread_creation_c.txt", avg_time, i/10000);
 
-        avg_time = measure_context_switch_time(i);
+        avg_time = measure_context_switch_time(i/100000);
+        write_to_file("measure_context_switch_time_c.txt", avg_time, i/10000);
 
-        write_to_file("measure_context_switch_time_c.txt", avg_time, i);
-
-        avg_time = measure_thread_migration(i);
-        write_to_file("measure_thread_migration_c.txt", avg_time, i);
+        avg_time = measure_thread_migration(i/100000);
+        write_to_file("measure_thread_migration_c.txt", avg_time, i/10000);
 
         first_open = false;
     }

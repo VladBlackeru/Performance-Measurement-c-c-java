@@ -27,7 +27,7 @@
 					[
 						0
 					],
-					"name" : "SCS",
+					"name" : "untitled",
 					"targetIndexes" : 
 					[
 						0
@@ -38,9 +38,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "SCS::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-SCS-Debug-af5c3fd2cb2d6a4e2a98.json",
-					"name" : "SCS",
+					"id" : "untitled::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-untitled-Debug-de4196885ad3290b3c23.json",
+					"name" : "untitled",
 					"projectIndex" : 0
 				}
 			]
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/VURADO/Desktop/scs/Performance-Measurement-c-c-java/SCS_cpp/cmake-build-debug",
-		"source" : "C:/Users/VURADO/Desktop/scs/Performance-Measurement-c-c-java/SCS_cpp"
+		"build" : "C:/Users/Vlod/Desktop/SCS/Programming Languages benchmark/SCS_c/cmake-build-debug",
+		"source" : "C:/Users/Vlod/Desktop/SCS/Programming Languages benchmark/SCS_c"
 	},
 	"version" : 
 	{
