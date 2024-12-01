@@ -185,22 +185,22 @@ public class Benchmark {
     public static void benchmark() {
         double avgTime;
         int k = 0;
-        for (int i = 10000; i <= 100000; i += 10000) {
+        for (int i = 10000; i <= 1000010000; i += 10000000) {
             System.out.println(k++);
-//            avgTime = dynamicMemoryAllocation(tests, i);
-//            writeToFile("mem_allocation_java.txt", avgTime, i);
-//
-//            avgTime = dynamicMemoryAccess(tests, i);
-//            writeToFile("dynamic_memory_access_java.txt", avgTime, i);
-//
-//            avgTime = threadCreation(i);
-//            writeToFile("thread_creation_java.txt", avgTime, i);
-//
-//            avgTime = measureContextSwitchTime(i);
-//            writeToFile("measure_context_switch_time_java.txt", avgTime, i);
+            avgTime = dynamicMemoryAllocation(tests, i);
+            writeToFile("mem_allocation_java.txt", avgTime, i);
 
-            //avgTime = measureThreadMigration(i);
-            //writeToFile("measure_thread_migration_java.txt", avgTime, i);
+            avgTime = dynamicMemoryAccess(tests, i);
+            writeToFile("dynamic_memory_access_java.txt", avgTime, i);
+
+            avgTime = threadCreation(i/100000);
+            writeToFile("thread_creation_java.txt", avgTime, i/100000);
+
+            avgTime = measureContextSwitchTime(i/100000);
+            writeToFile("measure_context_switch_time_java.txt", avgTime, i/100000);
+
+            avgTime = measureThreadMigration(i/100000);
+            writeToFile("measure_thread_migration_java.txt", avgTime, i/100000);
         }
     }
 }
